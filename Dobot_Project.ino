@@ -5,15 +5,17 @@ void setup() {
   // put your setup code here, to run once:
   dobot.begin();
   Serial.begin(9600);
-  delay(500);
+  delay(1000);
+  getMovementParams();
+  getJumpHeight();
   clearQueue();
   homeDobot();
-  delay(10000);
+  delay(20000);
 }
 
 void loop() {
   
-  setPosA();
+  setPosC();
   delay(2000);
   suckerOn();
   delay(250);
@@ -27,7 +29,7 @@ void loop() {
   setPosDel2();
   suckerOff();
 
-  setPosC();
+  setPosA();
   delay(2000);
   suckerOn();
   delay(250);
@@ -35,6 +37,42 @@ void loop() {
   suckerOff();
 
   delay(10000000);
+}
+
+void setJumpHeight() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 10;
+  byte messagePayload[] = {82, 1, 50, 1000};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set Jump Height");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void getJumpHeight() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 2;
+  byte messagePayload[] = {82, 0};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Get Jump Height");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void setMovementParams() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 10;
+  byte messagePayload[] = {83, 1};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set Movement Params");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void getMovementParams() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 2;
+  byte messagePayload[] = {83, 0};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Get Movement Params");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
 void setPosA() {
@@ -103,16 +141,16 @@ void setPosDel3() {
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
-void getPose() {
-  byte messageHead[] = {170, 170};
-  byte messageLen = 2;
-  byte messagePayload[] = {10, 1};
-  int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  byte messageChecksum;
-  //byte message[16] = {};
-  Serial.println("Get Pose");
-  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-}
+// void getPose() {
+//   byte messageHead[] = {170, 170};
+//   byte messageLen = 2;
+//   byte messagePayload[] = {10, 0};
+//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
+//   byte messageChecksum;
+//   //byte message[16] = {};
+//   Serial.println("Get Pose");
+//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+// }
 
 void suckerOn() {
   byte messageHead[] = {170, 170};
@@ -121,7 +159,7 @@ void suckerOn() {
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   byte messageChecksum;
   //byte message[16] = {};
-  Serial.println("Sucker On");
+  Serial.println("Suck");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
@@ -132,14 +170,14 @@ void suckerOff() {
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   byte messageChecksum;
   //byte message[16] = {};
-  Serial.println("Sucker Off");
+  Serial.println("Don't Suck");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
 void homeDobot() {
   byte messageHead[] = {170, 170};
   byte messageLen = 6;
-  byte messagePayload[] = {31, 3, 1, 0, 0, 0};
+  byte messagePayload[] = {31, 1, 1, 0, 0, 0};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   byte messageChecksum;
   byte message[16] = {};
