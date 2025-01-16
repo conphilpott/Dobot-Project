@@ -15,30 +15,58 @@ void setup() {
 
 void loop() {
   
-  setPosition(03);
+  //dobot.printPose();
+  //ctrlQueue(245); // clear command queue
+
+  setPosC();
   delay(2000);
   suckerCtrl(1);
   delay(250);
-  setPosition(10);
+  setPosDel1();
   suckerCtrl(0);
 
-  setPosition(02);
+  setPosB();
   delay(2000);
   suckerCtrl(1);
   delay(250);
-  setPosition(11);
+  setPosDel2();
   suckerCtrl(0);
 
-  setPosition(01);
+  setPosA();
   delay(2000);
   suckerCtrl(1);
   delay(250);
-  setPosition(12);
+  setPosDel3();
   suckerCtrl(0);
 
-  //setPosition(00); // go to rest position
+  setPosRest();
+  dobotDelay(5000);
 
-  delay(10000000);
+  setPosDel3();
+  delay(2000);
+  suckerCtrl(1);
+  delay(250);
+  setPosA();
+  suckerCtrl(0);
+
+  setPosDel2();
+  delay(2000);
+  suckerCtrl(1);
+  delay(250);
+  setPosB();
+  suckerCtrl(0);
+
+  setPosDel1();
+  delay(2000);
+  suckerCtrl(1);
+  delay(250);
+  setPosC();
+  suckerCtrl(0);
+
+  setPosRest();
+
+  dobotDelay(5000);
+
 }
 
 void setJumpHeight() {
@@ -77,130 +105,137 @@ void getMovementParams() {
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
-// void setPosA() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 19;
-//   byte messagePayload[] = {84, 3, 0, 209, 247, 227, 193, 180, 248, 100, 195, 198, 111, 46, 194, 47, 48, 194, 194};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Set PosA");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
-
-// void setPosB() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 19;
-//   byte messagePayload[] = {84, 3, 0, 23, 30, 181, 66, 144, 149, 76, 195, 22, 117, 62, 194, 62, 63, 132, 194};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Set PosB");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
-
-// void setPosC() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 19;
-//   byte messagePayload[] = {84, 3, 0, 221, 13, 52, 67, 252, 137, 13, 195, 10, 239, 45, 194, 172, 174, 24, 194};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Set PosC");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
-
-// void setPosDel1() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 19;
-//   byte messagePayload[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 150, 86, 71, 194, 113, 63, 31, 64};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Set PosDel1");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
-
-// void setPosDel2() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 19;
-//   byte messagePayload[] = {84, 3, 0, 86, 165, 97, 67, 232, 222, 196, 64, 92, 155, 157, 193, 75, 232, 199, 63};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Set PosDel2");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
-
-// void setPosDel3() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 19;
-//   byte messagePayload[] = {84, 3, 0, 45, 18, 100, 67, 250, 60, 192, 64, 192, 221, 22, 64, 132, 33, 193, 63};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Set PosDel3");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
-
-void setPosition(int position) {
-  // set the position from a predefined list
+void dobotDelay(int delay) {
   byte messageHead[] = {170, 170};
-  byte messageLen = 19;
-  int payloadLen = 0;
-  byte messagePayload[19] = {};
-  byte *messagePayloadPtr = messagePayload;
-  char positionDesc[] = {};
-  char *positionDescPtr = positionDesc;
-
-  // define rest position
-  byte messagePayloadRest[] = {84, 3, 0};
-
-  // define bay positions
-  byte messagePayloadBay01[] = {84, 3, 0, 209, 247, 227, 193, 180, 248, 100, 195, 198, 111, 46, 194, 47, 48, 194, 194};
-  byte messagePayloadBay02[] = {84, 3, 0, 23, 30, 181, 66, 144, 149, 76, 195, 22, 117, 62, 194, 62, 63, 132, 194};
-  byte messagePayloadBay03[] = {84, 3, 0, 221, 13, 52, 67, 252, 137, 13, 195, 10, 239, 45, 194, 172, 174, 24, 194};
-
-  // define delivery positions
-  byte messagePayloadDel01[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 150, 86, 71, 194, 113, 63, 31, 64};
-  byte messagePayloadDel02[] = {84, 3, 0, 86, 165, 97, 67, 232, 222, 196, 64, 92, 155, 157, 193, 75, 232, 199, 63};
-  byte messagePayloadDel03[] = {84, 3, 0, 45, 18, 100, 67, 250, 60, 192, 64, 192, 221, 22, 64, 132, 33, 193, 63};
-
-  switch (position) {
-    case 00:
-    messagePayloadPtr = messagePayloadRest;
-    positionDescPtr = "Rest";
-    break;
-    case 01:
-    messagePayloadPtr = messagePayloadBay01;
-    positionDescPtr = "Bay 1";
-    break;
-    case 02:
-    messagePayloadPtr = messagePayloadBay02;
-    positionDescPtr = "Bay 2";
-    break;   
-    case 03:
-    messagePayloadPtr = messagePayloadBay03;
-    positionDescPtr = "Bay 3";
-    break;
-    case 10:
-    messagePayloadPtr = messagePayloadDel01;
-    positionDescPtr = "Delivery level 0";
-    break;
-    case 11:
-    messagePayloadPtr = messagePayloadDel02;
-    positionDescPtr = "Delivery level 1";
-    break;
-    case 12:
-    messagePayloadPtr = messagePayloadDel03;
-    positionDescPtr = "Delivery level 2";
-    break;
-  }
-
-  payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.print("Set position to: ");
-  Serial.println(positionDesc);
+  byte messageLen = 8;
+  byte messagePayload[] = {110, 3, 1, delay};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosA");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-  return;
 }
 
-// void getPose() {
+void setPosRest() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 19;
+  byte messagePayload[] = {84, 3, 1, 27, 122, 86, 67, 248, 243, 183, 64, 6, 56, 83, 66, 231, 132, 196, 63};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosA");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void setPosA() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 19;
+  byte messagePayload[] = {84, 3, 0, 209, 247, 227, 193, 180, 248, 100, 195, 198, 111, 46, 194, 47, 48, 194, 194};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosA");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void setPosB() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 19;
+  byte messagePayload[] = {84, 3, 0, 23, 30, 181, 66, 144, 149, 76, 195, 22, 117, 62, 194, 62, 63, 132, 194};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosB");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void setPosC() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 19;
+  byte messagePayload[] = {84, 3, 0, 221, 13, 52, 67, 252, 137, 13, 195, 10, 239, 45, 194, 172, 174, 24, 194};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosC");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void setPosDel1() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 19;
+  byte messagePayload[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 150, 86, 71, 194, 113, 63, 31, 64};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosDel1");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void setPosDel2() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 19;
+  byte messagePayload[] = {84, 3, 0, 86, 165, 97, 67, 232, 222, 196, 64, 92, 155, 157, 193, 75, 232, 199, 63};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosDel2");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+void setPosDel3() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 19;
+  byte messagePayload[] = {84, 3, 0, 45, 18, 100, 67, 250, 60, 192, 64, 192, 221, 22, 64, 132, 33, 193, 63};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set PosDel3");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
+
+// void setPosition(int position) {
+//   // set the position from a predefined list
 //   byte messageHead[] = {170, 170};
-//   byte messageLen = 2;
-//   byte messagePayload[] = {10, 0};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   byte messageChecksum;
-//   //byte message[16] = {};
-//   Serial.println("Get Pose");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+//   byte messageLen = 19;
+//   int payloadLen = 0;
+//   byte messagePayload[19] = {};
+//   byte *messagePayloadPtr = messagePayload;
+//   char positionDesc[] = {};
+//   char *positionDescPtr = positionDesc;
+
+//   // define rest position
+//   byte messagePayloadRest[] = {84, 3, 0};
+
+//   // define bay positions
+//   byte messagePayloadBay01[] = {84, 3, 0, 209, 247, 227, 193, 180, 248, 100, 195, 198, 111, 46, 194, 47, 48, 194, 194};
+//   byte messagePayloadBay02[] = {84, 3, 0, 23, 30, 181, 66, 144, 149, 76, 195, 22, 117, 62, 194, 62, 63, 132, 194};
+//   byte messagePayloadBay03[] = {84, 3, 0, 221, 13, 52, 67, 252, 137, 13, 195, 10, 239, 45, 194, 172, 174, 24, 194};
+
+//   // define delivery positions
+//   byte messagePayloadDel01[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 150, 86, 71, 194, 113, 63, 31, 64};
+//   byte messagePayloadDel02[] = {84, 3, 0, 86, 165, 97, 67, 232, 222, 196, 64, 92, 155, 157, 193, 75, 232, 199, 63};
+//   byte messagePayloadDel03[] = {84, 3, 0, 45, 18, 100, 67, 250, 60, 192, 64, 192, 221, 22, 64, 132, 33, 193, 63};
+
+//   switch (position) {
+//     case 0:
+//     messagePayloadPtr = messagePayloadRest;
+//     positionDescPtr = "Rest";
+//     break;
+//     case 1:
+//     messagePayloadPtr = messagePayloadBay01;
+//     positionDescPtr = "Bay 1";
+//     break;
+//     case 2:
+//     messagePayloadPtr = messagePayloadBay02;
+//     positionDescPtr = "Bay 2";
+//     break;   
+//     case 3:
+//     messagePayloadPtr = messagePayloadBay03;
+//     positionDescPtr = "Bay 3";
+//     break;
+//     case 10:
+//     messagePayloadPtr = messagePayloadDel01;
+//     positionDescPtr = "Delivery level 0";
+//     break;
+//     case 11:
+//     messagePayloadPtr = messagePayloadDel02;
+//     positionDescPtr = "Delivery level 1";
+//     break;
+//     case 12:
+//     messagePayloadPtr = messagePayloadDel03;
+//     positionDescPtr = "Delivery level 2";
+//     break;
+//   }
+
+//   payloadLen = sizeof(messagePayloadPtr)/sizeof(byte);
+//   Serial.print("Set position to: ");
+//   Serial.println(positionDescPtr);
+//   sendCommand(messageHead, messageLen, messagePayloadPtr, payloadLen);
+//   return;
 // }
 
 void suckerCtrl(byte state) {
@@ -214,15 +249,6 @@ void suckerCtrl(byte state) {
   Serial.println(state);
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
-
-// void suckerOff() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 4;
-//   byte messagePayload[] = {62, 3, 1, 0};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Don't Suck");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
 
 void homeDobot() {
   // home the dobot
@@ -244,7 +270,7 @@ void homeDobot() {
 //   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 // }
 
-void ctrlQueue(byte mode) {
+void ctrlQueue(int mode) {
   // control the queue of commands using dobot command ID
   byte messageHead[] = {170, 170};
   byte messageLen = 2;

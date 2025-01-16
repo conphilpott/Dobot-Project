@@ -1,0 +1,7 @@
+Get Movement Params
+Sending command: 170, 170, 2, 83, 0, 173,
+Dobot response:  170 170 10 83 0 0 0 200 66 0 0 200 66 153
+
+Get Jump Height
+Sending command: 170, 170, 2, 82, 0, 174,
+Dobot response:  170 170 10 82 0 0 0 160 65 0 0 200 66 195
