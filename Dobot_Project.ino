@@ -1,14 +1,14 @@
 #include <Dobot.h>
 Dobot dobot = Dobot();
 
-bool slowMode = false; // enable slow mode, 5 second delay between command transmission
+bool slowMode = true; // enable slow mode, 5 second delay between command transmission
 
 void setup() {
   dobot.begin(); // setup comms with dobot using Dobot library
   Serial.begin(9600); // setup serial comms with pc using baudrate of 9600
   delay(1000); // wait 1s for everything to stablise
-  getMovementParams(); // get current acceleration and velocity parameters from the dobot
-  getJumpHeight(); // get current jump parameters
+  //getMovementParams(); // get current acceleration and velocity parameters from the dobot
+  //getJumpHeight(); // get current jump parameters
   ctrlQueue(245); // clear command queue
   homeDobot(); // home the dobot
 }
@@ -69,48 +69,49 @@ void loop() {
 
 }
 
-void setJumpHeight() {
-  byte messageHead[] = {170, 170};
-  byte messageLen = 10;
-  byte messagePayload[] = {82, 1, 50, 1000};
-  int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.println("Set Jump Height");
-  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-}
+// void setJumpHeight() {
+//   byte messageHead[] = {170, 170};
+//   byte messageLen = 10;
+//   byte messagePayload[] = {82, 1, 50, 1000};
+//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
+//   Serial.println("Set Jump Height");
+//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+// }
 
-void getJumpHeight() {
-  byte messageHead[] = {170, 170};
-  byte messageLen = 2;
-  byte messagePayload[] = {82, 0};
-  int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.println("Get Jump Height");
-  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-}
+// void getJumpHeight() {
+//   byte messageHead[] = {170, 170};
+//   byte messageLen = 2;
+//   byte messagePayload[] = {82, 0};
+//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
+//   Serial.println("Get Jump Height");
+//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+// }
 
-void setMovementParams() {
-  byte messageHead[] = {170, 170};
-  byte messageLen = 10;
-  byte messagePayload[] = {83, 1};
-  int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.println("Set Movement Params");
-  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-}
+// void setMovementParams() {
+//   byte messageHead[] = {170, 170};
+//   byte messageLen = 10;
+//   byte messagePayload[] = {83, 1};
+//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
+//   Serial.println("Set Movement Params");
+//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+// }
 
-void getMovementParams() {
-  byte messageHead[] = {170, 170};
-  byte messageLen = 2;
-  byte messagePayload[] = {83, 0};
-  int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.println("Get Movement Params");
-  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-}
+// void getMovementParams() {
+//   byte messageHead[] = {170, 170};
+//   byte messageLen = 2;
+//   byte messagePayload[] = {83, 0};
+//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
+//   Serial.println("Get Movement Params");
+//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+// }
 
 void dobotDelay(int delay) {
+  // Sets a delay in the dobot queue of "delay" milliseconds
   byte messageHead[] = {170, 170};
-  byte messageLen = 8;
-  byte messagePayload[] = {110, 3, 1, delay};
+  byte messageLen = 6;
+  byte messagePayload[] = {110, 3, delay};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.println("Set PosA");
+  Serial.println("Delay Dobot Command");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
@@ -274,8 +275,7 @@ void ctrlQueue(int mode) {
   // control the queue of commands using dobot command ID
   byte messageHead[] = {170, 170};
   byte messageLen = 2;
-  byte messagePayload[] = {0, 1};
-  messagePayload[0] = mode;
+  byte messagePayload[] = {mode, 1};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   Serial.println("Control Queue");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
