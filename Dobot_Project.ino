@@ -1,91 +1,189 @@
 #include <Dobot.h>
 Dobot dobot = Dobot();
 
-bool slowMode = true; // enable slow mode, 5 second delay between command transmission
+bool slowMode = false; // enable slow mode, 5 second delay between command transmission
+
+int buttonA = 5;
+int buttonB = 6;
+int buttonC = 7;
+int movementCount = 0;
 
 void setup() {
+
+  // setup button inputs
+  pinMode(buttonA, INPUT); 
+  pinMode(buttonB, INPUT);
+  pinMode(buttonC, INPUT); 
+
   dobot.begin(); // setup comms with dobot using Dobot library
   Serial.begin(9600); // setup serial comms with pc using baudrate of 9600
   delay(1000); // wait 1s for everything to stablise
   //getMovementParams(); // get current acceleration and velocity parameters from the dobot
-  //getJumpHeight(); // get current jump parameters
+  getJumpHeight(); // get current jump parameters
+  setJumpHeight();
+  getJumpHeight(); // get new jump parameters
   ctrlQueue(245); // clear command queue
+  suckerCtrl(0);
   homeDobot(); // home the dobot
 }
 
 void loop() {
   
-  //dobot.printPose();
+  dobot.printPose();
   //ctrlQueue(245); // clear command queue
 
-  setPosC();
-  delay(2000);
-  suckerCtrl(1);
-  delay(250);
-  setPosDel1();
-  suckerCtrl(0);
+char buttonSel;
 
-  setPosB();
-  delay(2000);
-  suckerCtrl(1);
-  delay(250);
-  setPosDel2();
-  suckerCtrl(0);
-
+if (digitalRead(buttonA)) {
   setPosA();
-  delay(2000);
   suckerCtrl(1);
-  delay(250);
-  setPosDel3();
-  suckerCtrl(0);
-
-  setPosRest();
-  dobotDelay(5000);
-
-  setPosDel3();
-  delay(2000);
-  suckerCtrl(1);
-  delay(250);
-  setPosA();
-  suckerCtrl(0);
-
-  setPosDel2();
-  delay(2000);
-  suckerCtrl(1);
-  delay(250);
+  dobotDelay(250);
+    switch (movementCount) {
+    case 0:
+      setPosDel3();
+      setPosDel1();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount++;
+      break;
+    case 1:
+      setPosDel3();
+      setPosDel2();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount++;
+      break;
+    case 2:
+      setPosDel3();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount = 0;
+      break;
+    }
+} else if (digitalRead(buttonB)) {
   setPosB();
-  suckerCtrl(0);
-
-  setPosDel1();
-  delay(2000);
   suckerCtrl(1);
-  delay(250);
+  dobotDelay(250);
+    switch (movementCount) {
+    case 0:
+      setPosDel3();
+      setPosDel1();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount++;
+      break;
+    case 1:
+      setPosDel3();
+      setPosDel2();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount++;
+      break;
+    case 2:
+      setPosDel3();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount = 0;
+      break;
+    }
+} else if (digitalRead(buttonC)) {
   setPosC();
-  suckerCtrl(0);
+  suckerCtrl(1);
+  dobotDelay(250);
+    switch (movementCount) {
+    case 0:
+      setPosDel3();
+      setPosDel1();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount++;
+      break;
+    case 1:
+      setPosDel3();
+      setPosDel2();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount++;
+      break;
+    case 2:
+      setPosDel3();
+      suckerCtrl(0);
+      setPosRest();
+      movementCount = 0;
+      break;
+    }
+}
 
-  setPosRest();
+ delay(5000);
 
-  dobotDelay(5000);
+  // setPosC();
+  // delay(2000);
+  // suckerCtrl(1);
+  // delay(250);
+  // setPosDel1();
+  // suckerCtrl(0);
+
+  // setPosB();
+  // delay(2000);
+  // suckerCtrl(1);
+  // delay(250);
+  // setPosDel2();
+  // suckerCtrl(0);
+
+  // setPosA();
+  // delay(2000);
+  // suckerCtrl(1);
+  // delay(250);
+  // setPosDel3();
+  // suckerCtrl(0);
+
+  // setPosRest();
+  // dobotDelay(5000);
+
+  // setPosDel3();
+  // delay(2000);
+  // suckerCtrl(1);
+  // delay(250);
+  // setPosA();
+  // suckerCtrl(0);
+
+  // setPosDel2();
+  // delay(2000);
+  // suckerCtrl(1);
+  // delay(250);
+  // setPosB();
+  // suckerCtrl(0);
+
+  // setPosDel1();
+  // delay(2000);
+  // suckerCtrl(1);
+  // delay(250);
+  // setPosC();
+  // suckerCtrl(0);
+
+  // setPosRest();
+
+  // dobotDelay(5000);
 
 }
 
-// void setJumpHeight() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 10;
-//   byte messagePayload[] = {82, 1, 50, 1000};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Set Jump Height");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
+void setJumpHeight() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 10;
+  byte messagePayload[] = {82, 1, 50000, 51266};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Set Jump Height");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
 
-// void getJumpHeight() {
-//   byte messageHead[] = {170, 170};
-//   byte messageLen = 2;
-//   byte messagePayload[] = {82, 0};
-//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-//   Serial.println("Get Jump Height");
-//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
-// }
+void getJumpHeight() {
+  byte messageHead[] = {170, 170};
+  byte messageLen = 2;
+  byte messagePayload[] = {82, 0};
+  int payloadLen = sizeof(messagePayload)/sizeof(byte);
+  Serial.println("Get Jump Height");
+  sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+}
 
 // void setMovementParams() {
 //   byte messageHead[] = {170, 170};
@@ -111,7 +209,9 @@ void dobotDelay(int delay) {
   byte messageLen = 6;
   byte messagePayload[] = {110, 3, delay};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.println("Delay Dobot Command");
+  Serial.print("Delay Dobot ");
+  Serial.print(delay);
+  Serial.println("ms");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
@@ -163,7 +263,7 @@ void setPosDel1() {
 void setPosDel2() {
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
-  byte messagePayload[] = {84, 3, 0, 86, 165, 97, 67, 232, 222, 196, 64, 92, 155, 157, 193, 75, 232, 199, 63};
+  byte messagePayload[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 92, 155, 157, 193, 75, 232, 199, 63};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   Serial.println("Set PosDel2");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
@@ -172,11 +272,29 @@ void setPosDel2() {
 void setPosDel3() {
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
-  byte messagePayload[] = {84, 3, 0, 45, 18, 100, 67, 250, 60, 192, 64, 192, 221, 22, 64, 132, 33, 193, 63};
+  byte messagePayload[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 192, 221, 22, 64, 132, 33, 193, 63};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   Serial.println("Set PosDel3");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
+
+// void setPosDel2() {
+//   byte messageHead[] = {170, 170};
+//   byte messageLen = 19;
+//   byte messagePayload[] = {84, 3, 0, 86, 165, 97, 67, 232, 222, 196, 64, 92, 155, 157, 193, 75, 232, 199, 63};
+//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
+//   Serial.println("Set PosDel2");
+//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+// }
+
+// void setPosDel3() {
+//   byte messageHead[] = {170, 170};
+//   byte messageLen = 19;
+//   byte messagePayload[] = {84, 3, 0, 45, 18, 100, 67, 250, 60, 192, 64, 192, 221, 22, 64, 132, 33, 193, 63};
+//   int payloadLen = sizeof(messagePayload)/sizeof(byte);
+//   Serial.println("Set PosDel3");
+//   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
+// }
 
 // void setPosition(int position) {
 //   // set the position from a predefined list
