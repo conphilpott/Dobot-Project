@@ -20,7 +20,7 @@ void setup() {
   delay(1000); // wait 1s for everything to stablise
   //getMovementParams(); // get current acceleration and velocity parameters from the dobot
   getJumpHeight(); // get current jump parameters
-  setJumpHeight();
+  setJumpHeight(); // set slightly higher jump parameters
   getJumpHeight(); // get new jump parameters
   ctrlQueue(245); // clear command queue
   suckerCtrl(0);
@@ -28,89 +28,81 @@ void setup() {
 }
 
 void loop() {
-
-if (digitalRead(buttonA)) {
-  setPosA();
-  suckerCtrl(1);
-  dobotDelay(250);
+  
+  delay(100); // 100ms delay for button polling
+  
+  if (digitalRead(buttonA)) {
+    setPosA();
+    suckerCtrl(1);
+    dobotDelay(250);
     switch (movementCount) {
-    case 0:
-      //setPosDel3();
-      setPosDel1();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount++;
-      break;
-    case 1:
-      //setPosDel3();
-      setPosDel2();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount++;
-      break;
-    case 2:
-      //setPosDel3();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount = 0;
-      break;
+      case 0:
+        setPosDel1();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount++;
+        break;
+      case 1:
+        setPosDel2();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount++;
+        break;
+      case 2:
+        suckerCtrl(0);
+        setPosRest();
+        movementCount = 0;
+        break;
     }
-} else if (digitalRead(buttonB)) {
-  setPosB();
-  suckerCtrl(1);
-  dobotDelay(250);
+  } else if (digitalRead(buttonB)) {
+    setPosB();
+    suckerCtrl(1);
+    dobotDelay(250);
     switch (movementCount) {
-    case 0:
-      //setPosDel3();
-      setPosDel1();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount++;
-      break;
-    case 1:
-      //setPosDel3();
-      setPosDel2();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount++;
-      break;
-    case 2:
-      setPosDel3();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount = 0;
-      break;
+      case 0:
+        setPosDel1();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount++;
+        break;
+      case 1:
+        setPosDel2();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount++;
+        break;
+      case 2:
+        setPosDel3();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount = 0;
+        break;
     }
-} else if (digitalRead(buttonC)) {
-  setPosC();
-  suckerCtrl(1);
-  dobotDelay(250);
+  } else if (digitalRead(buttonC)) {
+    setPosC();
+    suckerCtrl(1);
+    dobotDelay(250);
     switch (movementCount) {
-    case 0:
-      //setPosDel3();
-      setPosDel1();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount++;
-      break;
-    case 1:
-      //setPosDel3();
-      setPosDel2();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount++;
-      break;
-    case 2:
-      setPosDel3();
-      suckerCtrl(0);
-      setPosRest();
-      movementCount = 0;
-      break;
+      case 0:
+        setPosDel1();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount++;
+        break;
+      case 1:
+        setPosDel2();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount++;
+        break;
+      case 2:
+        setPosDel3();
+        suckerCtrl(0);
+        setPosRest();
+        movementCount = 0;
+        break;
     }
-}
-
- delay(100);
-
+  }
 }
 
 void setJumpHeight() {
@@ -242,29 +234,30 @@ void ctrlQueue(byte mode) {
 void sendCommand(byte *header, byte length, byte *payload, int payloadLen) {
   // construct message from input parameters, append checksum and send to dobot
   
-  int headerLen = sizeof(header)/sizeof(byte);
-  int lengthLen = sizeof(length)/sizeof(byte);
+  int headerLen = sizeof(header)/sizeof(byte); // calclate the length of the header
+  //Serial.println(headerLen);
+  int lengthLen = sizeof(length)/sizeof(byte); // calculate the length of the "length"
   //Serial.println(payloadLen);
-  byte checksum = calcChecksum(payload, payloadLen);
-  byte message[(headerLen + lengthLen + payloadLen + 1)] = {};
+  byte checksum = calcChecksum(payload, payloadLen); // function call for calcChecksum to calculate the checksum of the payload
+  byte message[(headerLen + lengthLen + payloadLen + 1)] = {}; // construct an empty message byte array with the correct length
 
   // Serial.print("Checksum is: ");
   // Serial.println(checksum);
 
   for (int i = 0; i < headerLen; i++) {
-    message[i] = header[i];
+    message[i] = header[i]; // dump the header to the message byte array
   }
   for (int i = headerLen; i < (headerLen + lengthLen); i++) {
-    message[i] = length;
+    message[i] = length; // dump the length to the message byte array
   }
   int j = 0;
   for (int i = headerLen + lengthLen; i < (headerLen + lengthLen + payloadLen); i++) {
-    message[i] = payload[j];
+    message[i] = payload[j]; // dump the payload to the message byte array
     j++;
   }
+  message[headerLen + lengthLen + payloadLen] = checksum; // dump the checksum to the message byte arrey
 
-  message[headerLen + lengthLen + payloadLen] = checksum;
-
+  // print the message byte array to the serial monitor
   int messageSize = sizeof(message)/sizeof(byte);
   //Serial.print(messageSize);
   Serial.print("Sending command: ");
@@ -274,7 +267,9 @@ void sendCommand(byte *header, byte length, byte *payload, int payloadLen) {
   }
   Serial.println();
 
+  // send the message byte array to the dobot using the library
   dobot.commandFrame(message);
+  // optional slow mode for debugging
   if (slowMode == true) {
     delay(5000);
   }
@@ -284,12 +279,14 @@ void sendCommand(byte *header, byte length, byte *payload, int payloadLen) {
 byte calcChecksum(byte *payload, int arraySize) {
   // calculate the checksum required for the dobot and return it as a byte
 
-  byte payloadSum = 0;
+  int payloadSum = 0; // cast payloadSum as an int to prevent overflow
   byte result = 0;
   
+  // calculate the sum of the payload array
   for (int i = 0; i < arraySize; i++) {
     payloadSum += payload[i];
   }
+  // calculate the final checksum
   result = 256 - (payloadSum % 256);
 
   //Serial.print("Calculated checksum is: ");
