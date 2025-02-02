@@ -3,9 +3,12 @@ Dobot dobot = Dobot();
 
 bool slowMode = false; // enable slow mode, 5 second delay between command transmission
 
+// define button pins
 int buttonA = 5;
 int buttonB = 6;
 int buttonC = 7;
+
+// initialise movement counter
 int movementCount = 0;
 
 void setup() {
@@ -19,11 +22,11 @@ void setup() {
   Serial.begin(9600); // setup serial comms with pc using baudrate of 9600
   delay(1000); // wait 1s for everything to stablise
   //getMovementParams(); // get current acceleration and velocity parameters from the dobot
-  getJumpHeight(); // get current jump parameters
+  //getJumpHeight(); // get current jump parameters
   setJumpHeight(); // set slightly higher jump parameters
-  getJumpHeight(); // get new jump parameters
+  //getJumpHeight(); // get new jump parameters
   ctrlQueue(245); // clear command queue
-  suckerCtrl(0);
+  suckerCtrl(0); // disable suction
   homeDobot(); // home the dobot
 }
 
@@ -31,81 +34,104 @@ void loop() {
   
   delay(100); // 100ms delay for button polling
   
+  // check if button A is pressed
   if (digitalRead(buttonA)) {
-    setPosA();
-    suckerCtrl(1);
-    dobotDelay(250);
-    switch (movementCount) {
-      case 0:
-        setPosDel1();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount++;
-        break;
-      case 1:
-        setPosDel2();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount++;
-        break;
-      case 2:
-        suckerCtrl(0);
-        setPosRest();
-        movementCount = 0;
-        break;
-    }
+    setPosA(); // go to pickup position A
+    // suckerCtrl(1); // enable the suction
+    // dobotDelay(250); // wait 250ms to get hold of the block
+
+    // decide where to place the block depending on how many have already been moved
+    movementCtrl(movementCount);
+
+    // switch (movementCount) {
+    //   case 0:
+    //     setPosDel1(); // go to delivery position 1
+    //     suckerCtrl(0); // disable the suction
+    //     setPosRest(); // go to the rest position
+    //     movementCount++; // increment the movement counter
+    //     break;
+    //   case 1:
+    //     setPosDel2(); // go to delivery position 2
+    //     suckerCtrl(0); // disable the suction
+    //     setPosRest(); // go to the rest position
+    //     movementCount++; // increment the movement counter
+    //     break;
+    //   case 2:
+    //     setPosDel3(); // go to delivery position 3
+    //     suckerCtrl(0); // disable the suction
+    //     setPosRest(); // go to the rest position
+    //     movementCount = 0; // reset the movement counter
+    //     break;
+    // }
+
+  // check if button B is pressed
   } else if (digitalRead(buttonB)) {
-    setPosB();
-    suckerCtrl(1);
-    dobotDelay(250);
-    switch (movementCount) {
-      case 0:
-        setPosDel1();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount++;
-        break;
-      case 1:
-        setPosDel2();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount++;
-        break;
-      case 2:
-        setPosDel3();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount = 0;
-        break;
-    }
+    setPosB(); // go to pickup position B
+    // suckerCtrl(1); // enable the suction
+    // dobotDelay(250); // wait 250ms to get hold of the block
+    
+    // decide where to place the block depending on how many have already been moved
+    movementCtrl(movementCount);
+
   } else if (digitalRead(buttonC)) {
     setPosC();
-    suckerCtrl(1);
-    dobotDelay(250);
-    switch (movementCount) {
-      case 0:
-        setPosDel1();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount++;
-        break;
-      case 1:
-        setPosDel2();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount++;
-        break;
-      case 2:
-        setPosDel3();
-        suckerCtrl(0);
-        setPosRest();
-        movementCount = 0;
-        break;
-    }
+    // suckerCtrl(1); // enable the suction
+    // dobotDelay(250); // wait 250ms to get hold of the block
+
+    // decide where to place the block depending on how many have already been moved
+    movementCtrl(movementCount);
+
+    // switch (movementCount) {
+    //   case 0:
+    //     setPosDel1();
+    //     suckerCtrl(0);
+    //     setPosRest();
+    //     movementCount++;
+    //     break;
+    //   case 1:
+    //     setPosDel2();
+    //     suckerCtrl(0);
+    //     setPosRest();
+    //     movementCount++;
+    //     break;
+    //   case 2:
+    //     setPosDel3();
+    //     suckerCtrl(0);
+    //     setPosRest();
+    //     movementCount = 0;
+    //     break;
+    // }
   }
 }
 
+void movementCtrl(int movementCount) {
+  suckerCtrl(1); // enable the suction
+  dobotDelay(250); // wait 250ms to get hold of the block
+  switch (movementCount) {
+      case 0:
+        setPosDel1(); // go to delivery position 1
+        suckerCtrl(0); // disable the suction
+        setPosRest(); // go to the rest position
+        movementCount++; // increment the movement counter
+        break;
+      case 1:
+        setPosDel2(); // go to delivery position 2
+        suckerCtrl(0); // disable the suction
+        setPosRest(); // go to the rest position
+        movementCount++; // increment the movement counter
+        break;
+      case 2:
+        setPosDel3(); // go to delivery position 3
+        suckerCtrl(0); // disable the suction
+        setPosRest(); // go to the rest position
+        movementCount = 0; // reset the movement counter
+        break;
+    }
+    return;
+}
+
 void setJumpHeight() {
+  // sets the jump height of PTP Jump commands
   byte messageHead[] = {170, 170};
   byte messageLen = 10;
   byte messagePayload[] = {82, 1, 0, 0, 255, 65, 0, 0, 255, 65};
@@ -115,6 +141,7 @@ void setJumpHeight() {
 }
 
 void getJumpHeight() {
+  // gets the current jump height
   byte messageHead[] = {170, 170};
   byte messageLen = 2;
   byte messagePayload[] = {82, 0};
@@ -136,6 +163,7 @@ void dobotDelay(byte delay) {
 }
 
 void setPosRest() {
+  // define the rest postion of the dobot
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
   byte messagePayload[] = {84, 3, 1, 27, 122, 86, 67, 248, 243, 183, 64, 6, 56, 83, 66, 231, 132, 196, 63};
@@ -145,6 +173,7 @@ void setPosRest() {
 }
 
 void setPosA() {
+  // define pickup position A
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
   //byte messagePayload[] = {84, 3, 0, 209, 247, 227, 193, 180, 248, 100, 195, 198, 111, 46, 194, 47, 48, 194, 194}; // old position
@@ -155,6 +184,7 @@ void setPosA() {
 }
 
 void setPosB() {
+  // define pickup position B
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
   byte messagePayload[] = {84, 3, 0, 23, 30, 181, 66, 144, 149, 76, 195, 22, 117, 62, 194, 62, 63, 132, 194};
@@ -164,6 +194,7 @@ void setPosB() {
 }
 
 void setPosC() {
+  // define pickup position C
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
   byte messagePayload[] = {84, 3, 0, 221, 13, 52, 67, 252, 137, 13, 195, 10, 239, 45, 194, 172, 174, 24, 194};
@@ -173,6 +204,7 @@ void setPosC() {
 }
 
 void setPosDel1() {
+  // define delivery position 1
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
   byte messagePayload[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 150, 86, 71, 194, 113, 63, 31, 64};
@@ -182,6 +214,7 @@ void setPosDel1() {
 }
 
 void setPosDel2() {
+  // define delivery position 2
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
   byte messagePayload[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 92, 155, 157, 193, 75, 232, 199, 63};
@@ -191,6 +224,7 @@ void setPosDel2() {
 }
 
 void setPosDel3() {
+  // define delivery position 3
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
   byte messagePayload[] = {84, 3, 0, 111, 84, 105, 67, 45, 59, 34, 65, 192, 221, 22, 64, 132, 33, 193, 63};
