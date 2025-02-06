@@ -14,9 +14,9 @@ int movementCount = 0;
 void setup() {
 
   // setup button inputs
-  pinMode(buttonA, INPUT); 
-  pinMode(buttonB, INPUT);
-  pinMode(buttonC, INPUT); 
+  pinMode(buttonA, INPUT_PULLUP); 
+  pinMode(buttonB, INPUT_PULLUP);
+  pinMode(buttonC, INPUT_PULLUP); 
 
   dobot.begin(); // setup comms with dobot using Dobot library
   Serial.begin(9600); // setup serial comms with pc using baudrate of 9600
@@ -35,7 +35,7 @@ void loop() {
   delay(100); // 100ms delay for button polling
   
   // check if button A is pressed
-  if (digitalRead(buttonA)) {
+  if (!digitalRead(buttonA)) {
     setPosA(); // go to pickup position A
     // suckerCtrl(1); // enable the suction
     // dobotDelay(250); // wait 250ms to get hold of the block
@@ -65,7 +65,7 @@ void loop() {
     // }
 
   // check if button B is pressed
-  } else if (digitalRead(buttonB)) {
+  } else if (!digitalRead(buttonB)) {
     setPosB(); // go to pickup position B
     // suckerCtrl(1); // enable the suction
     // dobotDelay(250); // wait 250ms to get hold of the block
@@ -73,7 +73,7 @@ void loop() {
     // decide where to place the block depending on how many have already been moved
     movementCtrl(movementCount);
 
-  } else if (digitalRead(buttonC)) {
+  } else if (!digitalRead(buttonC)) {
     setPosC();
     // suckerCtrl(1); // enable the suction
     // dobotDelay(250); // wait 250ms to get hold of the block
