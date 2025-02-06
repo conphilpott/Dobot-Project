@@ -27,84 +27,35 @@ void setup() {
   //getJumpHeight(); // get new jump parameters
   ctrlQueue(245); // clear command queue
   suckerCtrl(0); // disable suction
-  homeDobot(); // home the dobot
+  //homeDobot(); // home the dobot
 }
 
 void loop() {
   
   delay(100); // 100ms delay for button polling
-  
+  Serial.println("Waiting for button press");
+
   // check if button A is pressed
   if (!digitalRead(buttonA)) {
     setPosA(); // go to pickup position A
-    // suckerCtrl(1); // enable the suction
-    // dobotDelay(250); // wait 250ms to get hold of the block
 
-    // decide where to place the block depending on how many have already been moved
-    movementCtrl(movementCount);
-
-    // switch (movementCount) {
-    //   case 0:
-    //     setPosDel1(); // go to delivery position 1
-    //     suckerCtrl(0); // disable the suction
-    //     setPosRest(); // go to the rest position
-    //     movementCount++; // increment the movement counter
-    //     break;
-    //   case 1:
-    //     setPosDel2(); // go to delivery position 2
-    //     suckerCtrl(0); // disable the suction
-    //     setPosRest(); // go to the rest position
-    //     movementCount++; // increment the movement counter
-    //     break;
-    //   case 2:
-    //     setPosDel3(); // go to delivery position 3
-    //     suckerCtrl(0); // disable the suction
-    //     setPosRest(); // go to the rest position
-    //     movementCount = 0; // reset the movement counter
-    //     break;
-    // }
+    movementCtrl();
 
   // check if button B is pressed
   } else if (!digitalRead(buttonB)) {
     setPosB(); // go to pickup position B
-    // suckerCtrl(1); // enable the suction
-    // dobotDelay(250); // wait 250ms to get hold of the block
-    
-    // decide where to place the block depending on how many have already been moved
-    movementCtrl(movementCount);
+
+    movementCtrl();
 
   } else if (!digitalRead(buttonC)) {
     setPosC();
-    // suckerCtrl(1); // enable the suction
-    // dobotDelay(250); // wait 250ms to get hold of the block
 
-    // decide where to place the block depending on how many have already been moved
-    movementCtrl(movementCount);
+    movementCtrl();
 
-    // switch (movementCount) {
-    //   case 0:
-    //     setPosDel1();
-    //     suckerCtrl(0);
-    //     setPosRest();
-    //     movementCount++;
-    //     break;
-    //   case 1:
-    //     setPosDel2();
-    //     suckerCtrl(0);
-    //     setPosRest();
-    //     movementCount++;
-    //     break;
-    //   case 2:
-    //     setPosDel3();
-    //     suckerCtrl(0);
-    //     setPosRest();
-    //     movementCount = 0;
-    //     break;
-    // }
   }
 }
 
-void movementCtrl(int movementCount) {
+void movementCtrl() {
   suckerCtrl(1); // enable the suction
   dobotDelay(250); // wait 250ms to get hold of the block
   switch (movementCount) {
@@ -168,7 +119,7 @@ void setPosRest() {
   byte messageLen = 19;
   byte messagePayload[] = {84, 3, 1, 27, 122, 86, 67, 248, 243, 183, 64, 6, 56, 83, 66, 231, 132, 196, 63};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
-  Serial.println("Set PosA");
+  Serial.println("Set PosRest");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
 }
 
@@ -176,8 +127,7 @@ void setPosA() {
   // define pickup position A
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
-  //byte messagePayload[] = {84, 3, 0, 209, 247, 227, 193, 180, 248, 100, 195, 198, 111, 46, 194, 47, 48, 194, 194}; // old position
-  byte messagePayload[] = {84, 3, 0, 157, 164, 49, 67, 130, 245, 18, 195, 152, 224, 47, 194, 99, 102, 30, 194}; // new position
+  byte messagePayload[] = {84, 3, 0, 209, 247, 227, 193, 180, 248, 100, 195, 198, 111, 46, 194, 47, 48, 194, 194};
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   Serial.println("Set PosA");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
@@ -197,7 +147,8 @@ void setPosC() {
   // define pickup position C
   byte messageHead[] = {170, 170};
   byte messageLen = 19;
-  byte messagePayload[] = {84, 3, 0, 221, 13, 52, 67, 252, 137, 13, 195, 10, 239, 45, 194, 172, 174, 24, 194};
+  //byte messagePayload[] = {84, 3, 0, 221, 13, 52, 67, 252, 137, 13, 195, 10, 239, 45, 194, 172, 174, 24, 194}; // old position
+  byte messagePayload[] = {84, 3, 0, 157, 164, 49, 67, 130, 245, 18, 195, 152, 224, 47, 194, 99, 102, 30, 194}; // new position
   int payloadLen = sizeof(messagePayload)/sizeof(byte);
   Serial.println("Set PosC");
   sendCommand(messageHead, messageLen, messagePayload, payloadLen);
