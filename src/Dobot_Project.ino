@@ -21,37 +21,30 @@ void setup() {
   dobot.begin(); // setup comms with dobot using Dobot library
   Serial.begin(9600); // setup serial comms with pc using baudrate of 9600
   delay(1000); // wait 1s for everything to stablise
-  //getMovementParams(); // get current acceleration and velocity parameters from the dobot
   //getJumpHeight(); // get current jump parameters
   setJumpHeight(); // set slightly higher jump parameters
   //getJumpHeight(); // get new jump parameters
   ctrlQueue(245); // clear command queue
   suckerCtrl(0); // disable suction
-  //homeDobot(); // home the dobot
+  homeDobot(); // home the dobot
 }
 
 void loop() {
-  
+
   delay(100); // 100ms delay for button polling
   Serial.println("Waiting for button press");
 
   // check if button A is pressed
   if (!digitalRead(buttonA)) {
     setPosA(); // go to pickup position A
-
     movementCtrl();
-
   // check if button B is pressed
   } else if (!digitalRead(buttonB)) {
     setPosB(); // go to pickup position B
-
     movementCtrl();
-
   } else if (!digitalRead(buttonC)) {
     setPosC();
-
     movementCtrl();
-
   }
 }
 
@@ -226,9 +219,6 @@ void sendCommand(byte *header, byte length, byte *payload, int payloadLen) {
   byte checksum = calcChecksum(payload, payloadLen); // function call for calcChecksum to calculate the checksum of the payload
   byte message[(headerLen + lengthLen + payloadLen + 1)] = {}; // construct an empty message byte array with the correct length
 
-  // Serial.print("Checksum is: ");
-  // Serial.println(checksum);
-
   for (int i = 0; i < headerLen; i++) {
     message[i] = header[i]; // dump the header to the message byte array
   }
@@ -240,7 +230,7 @@ void sendCommand(byte *header, byte length, byte *payload, int payloadLen) {
     message[i] = payload[j]; // dump the payload to the message byte array
     j++;
   }
-  message[headerLen + lengthLen + payloadLen] = checksum; // dump the checksum to the message byte arrey
+  message[headerLen + lengthLen + payloadLen] = checksum; // dump the checksum to the message byte array
 
   // print the message byte array to the serial monitor
   int messageSize = sizeof(message)/sizeof(byte);
