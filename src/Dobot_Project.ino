@@ -70,6 +70,12 @@ void movementCtrl() {
         setPosRest(); // go to the rest position
         movementCount = 0; // reset the movement counter
         break;
+      default:
+        suckerCtrl(0); // disable the suction
+        setPosRest(); // go to the rest position
+        movementCount = 0; // reset the movement counter
+        Serial.println("Invalid movementCount detected! Returning to rest position.");
+        break:
     }
     return;
 }
